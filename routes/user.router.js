@@ -16,8 +16,6 @@ const {
 router.route('/').get(Authenticated, isAdmin, getAllUsers).post(createUser);
 router.route('/currentUser').get(Authenticated, getCurrentUser);
 router.route('/login').post(login);
-router.route('/inOrOut').get(inOrOut);
-router.route('/logout').get(Authenticated, logout);
 
 router
   .route('/:id')

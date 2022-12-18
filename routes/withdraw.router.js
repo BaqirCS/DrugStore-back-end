@@ -10,8 +10,8 @@ const {
 
 router
   .route('/')
-  .get(Authenticated, isAdmin, getAllWithdraw)
-  .post(Authenticated, isAdmin, createWithdraw);
+  .get(Authenticated, getAllWithdraw)
+  .post(Authenticated, createWithdraw);
 router
   .route('/:id')
   .get(Authenticated, isAdmin, getSingleWithdraw)

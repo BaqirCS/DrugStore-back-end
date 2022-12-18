@@ -1,20 +1,28 @@
 const jwt = require('jsonwebtoken');
 const CustomError = require('../utils/CustomError');
 
-const GenerateJWTandPassToken = async (res, payload) => {
+const GenerateJWTandPassToken = async (payload) => {
   const token = await jwt.sign(payload, process.env.JWT_SECRETE, {
     expiresIn: '1d',
   });
-  res.cookie('token', token, {
-    expiresIn: new Date(Date.now() + 1000 * 60 * 60 * 24),
-  });
+  return token;
 };
 
 const Authenticated = (req, res, next) => {
-  const token = req.cookies.token;
-  if (!token) {
-    return next(new CustomError('Bad Authorizatoin, please log in first', 401));
+  const header = req.headers.authorization;
+  if (!header) {
+    return next(
+      new CustomError('Bad authentication, please log in first', 401)
+    );
   }
+
+  const token = header.split(' ')[1];
+  if (!header.startsWith('Bearer ') || !token) {
+    return next(
+      new CustomError('Bad authentication, please log in first', 401)
+    );
+  }
+
   try {
     const decode = jwt.decode(token);
     req.user = {

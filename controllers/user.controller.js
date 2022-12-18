@@ -55,6 +55,7 @@ const updateUser = async (req, res, next) => {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
       throw new CustomError('ID is not Formatted correctly', 401);
     }
+
     checkPermission(req.user, req.params.id);
     const user = await User.findById(req.params.id);
     if (!user) {
@@ -71,8 +72,7 @@ const updateUser = async (req, res, next) => {
     if (password) {
       user.password = password;
     }
-
-    if (status) {
+    if (status && user.status !== status) {
       checkIsAdmin(req.user);
       user.status = status;
     }
@@ -122,32 +122,20 @@ const login = async (req, res, next) => {
     }
     if (user.status === 'pending') {
       throw new CustomError(
-        'your status is pending,please ask adming to change your status',
+        'you are not allowd to log in, please contact app administrator',
         401
       );
     }
-
     const payload = {
       userId: user._id,
       name: user.name,
       email: user.email,
       status: user.status,
     };
-    await GenerateJWTandPassToken(res, payload);
-
     res.status(200).json({
       user: payload,
+      token: await GenerateJWTandPassToken(payload),
     });
-  } catch (error) {
-    next(error);
-  }
-};
-
-//Logout  user => GET Met => Private Acc
-const logout = async (req, res, next) => {
-  try {
-    res.cookie('token', 'log out', { maxAge: 1 });
-    res.status(200).json({ success: true });
   } catch (error) {
     next(error);
   }
@@ -162,11 +150,7 @@ const getCurrentUser = async (req, res, next) => {
     next(error);
   }
 };
-const inOrOut = (req, res, next) => {
-  const token = req.cookies.token;
-  const success = token ? true : false;
-  res.status(200).json(success);
-};
+
 module.exports = {
   createUser,
   getAllUsers,
@@ -174,7 +158,5 @@ module.exports = {
   updateUser,
   deleteUser,
   login,
-  logout,
   getCurrentUser,
-  inOrOut,
 };

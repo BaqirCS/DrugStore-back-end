@@ -13,10 +13,10 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 const MongoUrl = process.env.MONGO_URL;
 //built in middleware
-app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json({ extended: true }));
 app.use(cors());
+app.use(cookieParser());
 
 //Routing
 app.use('/api/users', require('./routes/user.router'));

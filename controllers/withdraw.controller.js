@@ -41,9 +41,8 @@ const createWithdraw = async (req, res, next) => {
     date = req.body.date;
     const stringFormat =
       date.split('/')[2] + '-' + date.split('/')[1] + '-' + date.split('/')[0];
-    req.body.date = new Date(stringFormat);
+    req.body.date = stringFormat;
     const withdraw = await Withdraw.create(req.body);
-
     res.status(200).json(withdraw);
   } catch (error) {
     next(error);
